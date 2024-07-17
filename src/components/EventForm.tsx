@@ -2,14 +2,18 @@
 
 import type * as PrismaTypes from '@prisma/client';
 import { Button, Textarea, TextInput } from 'flowbite-react';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { GiftForm } from './GiftForm';
+import { updateEvent, UpdateEventRequest } from '@/api-service/event';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface EventFormProps {
   event: PrismaTypes.Event;
   publicLink: string;
   privateLink: string;
+  gifts: PrismaTypes.Gift[];
 }
 
 export type EventFormData = {
@@ -19,24 +23,69 @@ export type EventFormData = {
 };
 
 export type GiftFormData = {
+  id?: number;
   name: string;
-  link: string;
-  price: number;
-  image: string;
+  link?: string | null;
+  price?: number | null;
+  image?: string | null;
   booked: boolean;
 };
 
-export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }) => {
-  const { control, handleSubmit, formState } = useForm<EventFormData>({
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  description: yup.string().nullable().max(1024),
+  gifts: yup
+    .array()
+    .required()
+    .of(
+      yup.object().shape({
+        name: yup.string().required(),
+        link: yup.string().nullable(),
+        price: yup.number().nullable(),
+        image: yup.string().nullable(),
+        booked: yup.bool().required(),
+      }),
+    ),
+});
+
+export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink, gifts }) => {
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<EventFormData>({
     defaultValues: {
       description: event.description,
       name: event.name,
+      gifts,
     },
+    resolver: yupResolver(schema),
   });
 
-  const { fields, append } = useFieldArray({ control, name: 'gifts' });
+  const { fields, append, remove } = useFieldArray({ control, name: 'gifts' });
 
-  const submitHandler: SubmitHandler<EventFormData> = useCallback(async (formData) => {}, []);
+  const submitHandler: SubmitHandler<EventFormData> = useCallback(
+    async (formData) => {
+      try {
+        const params: UpdateEventRequest = {
+          name: formData.name,
+          description: formData.description ?? '',
+          gifts: formData.gifts.map((item) => ({
+            id: item.id,
+            name: item.name || '',
+            booked: item.booked || false,
+            image: item.image || '',
+            link: item.link || '',
+            price: item.price || 0,
+          })),
+        };
+        await updateEvent(event.privateId, params);
+      } catch {
+        ///
+      }
+    },
+    [event.privateId],
+  );
 
   return (
     <form
@@ -78,17 +127,23 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
           <div className="mt-1 text-xs opacity-60">Это публичная ссылка для ваших друзей</div>
         </div>
 
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => <TextInput {...field} placeholder="Название" />}
-        />
+        <div>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => <TextInput {...field} placeholder="Название" />}
+          />
+          {errors.name?.message && <div className="mt-2 text-xs text-red-500">{errors.name.message}</div>}
+        </div>
 
-        <Controller
-          control={control}
-          name="description"
-          render={({ field }) => <Textarea {...field} value={field.value ?? ''} placeholder="Описание" />}
-        />
+        <div>
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => <Textarea {...field} value={field.value ?? ''} placeholder="Описание" />}
+          />
+          {errors.description?.message && <div className="mt-2 text-xs text-red-500">{errors.description.message}</div>}
+        </div>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -105,12 +160,12 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
         </div>
         <div className="flex flex-col-reverse gap-6">
           {fields.map((item, idx) => (
-            <GiftForm key={item.id} index={idx} control={control} />
+            <GiftForm key={item.id} index={idx} control={control} errors={errors} onDeleteClick={() => remove(idx)} />
           ))}
         </div>
       </div>
 
-      <Button type="submit" gradientDuoTone="purpleToPink" outline className="sm:self-end">
+      <Button type="submit" gradientDuoTone="purpleToPink" outline className="sm:self-end" disabled={isSubmitting}>
         Сохранить
       </Button>
     </form>

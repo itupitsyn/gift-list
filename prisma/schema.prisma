@@ -14,15 +14,15 @@ datasource db {
 }
 
 model Event {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  name         String   @db.VarChar(255)
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  name         String    @db.VarChar(255)
   date         DateTime?
-  description  String?
-  privateId    String   @unique @db.VarChar(128)
-  publicId     String   @unique @db.VarChar(128)
-  ownerContact String   @db.VarChar(255)
+  description  String?   @db.VarChar(1024)
+  privateId    String    @unique @db.VarChar(128)
+  publicId     String    @unique @db.VarChar(128)
+  ownerContact String    @db.VarChar(255)
   Gift         Gift[]
 }
 
@@ -31,15 +31,15 @@ model Gift {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name      String   @db.VarChar(255)
-  link      String
-  price     Int
+  link      String?
+  price     Int?
   event     Event    @relation(fields: [eventId], references: [id])
   eventId   Int
-  Images    Images[]
+  Images    Image[]
   booked    Boolean  @default(false)
 }
 
-model Images {
+model Image {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
