@@ -18,9 +18,24 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
 
   return (
     <Card>
-      <Button type="button" size="xs" gradientDuoTone="purpleToPink" onClick={onDeleteClick} className="self-end">
-        utilize
-      </Button>
+      <div className="flex justify-between gap-4">
+        <div>
+          <Controller
+            control={control}
+            name={`gifts.${index}.booked`}
+            render={({ field }) => (
+              <Label>
+                <Checkbox {...field} value={undefined} checked={field.value} color="purple" className="mr-2" />
+                Забронировано
+              </Label>
+            )}
+          />
+        </div>
+
+        <Button type="button" size="xs" gradientDuoTone="purpleToPink" onClick={onDeleteClick} className="self-end">
+          utilize
+        </Button>
+      </div>
 
       <div>
         <Controller
@@ -29,19 +44,6 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
           render={({ field }) => <TextInput {...field} placeholder="Название" />}
         />
         {currentErrors?.name?.message && <div className="mt-2 text-xs text-red-500">{currentErrors.name.message}</div>}
-      </div>
-
-      <div>
-        <Controller
-          control={control}
-          name={`gifts.${index}.booked`}
-          render={({ field }) => (
-            <Label>
-              <Checkbox {...field} value={undefined} checked={field.value} color="purple" className="mr-2" />
-              Забронировано
-            </Label>
-          )}
-        />
       </div>
 
       <div>

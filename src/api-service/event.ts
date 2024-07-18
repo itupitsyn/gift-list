@@ -22,7 +22,9 @@ export const updateEvent = async (id: string, params: UpdateEventRequest) => {
   params.gifts.forEach((item, idx) => {
     Object.entries(item).forEach(async ([k, v]) => {
       if (k !== 'image') {
-        paramsFormData.append(`gifts[${idx}].${k}`, String(v));
+        if (v) {
+          paramsFormData.append(`gifts[${idx}].${k}`, String(v));
+        }
       } else {
         const data = await fetch(String(v)).then((r) => r.blob());
         paramsFormData.append(`gifts[${idx}].${k}`, data);

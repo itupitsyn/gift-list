@@ -29,10 +29,16 @@ export const getEvent = async (id: string) => {
       where: {
         privateId: id,
       },
+      include: {
+        Gift: true,
+      },
     }),
     prisma.event.findFirst({
       where: {
         publicId: id,
+      },
+      include: {
+        Gift: true,
       },
     }),
   ]);
