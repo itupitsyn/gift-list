@@ -23,7 +23,8 @@ model Event {
   privateId    String    @unique @db.VarChar(128)
   publicId     String    @unique @db.VarChar(128)
   ownerContact String    @db.VarChar(255)
-  Gift         Gift[]
+  gift         Gift[]
+  image        Image[]
 }
 
 model Gift {
@@ -33,9 +34,9 @@ model Gift {
   name      String   @db.VarChar(255)
   link      String?
   price     Int?
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   eventId   Int
-  Images    Image[]
+  images    Image[]
   booked    Boolean  @default(false)
 }
 
@@ -43,7 +44,9 @@ model Image {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  gift      Gift     @relation(fields: [giftId], references: [id])
-  giftId    Int
+  gift      Gift?    @relation(fields: [giftId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  giftId    Int?
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  eventId   Int?
   url       String
 }

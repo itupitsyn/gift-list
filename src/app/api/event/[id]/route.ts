@@ -25,11 +25,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const description = body.get('description') as string;
   if (description) data.description = description;
 
+  const date = body.get('date') as string;
+  if (date) data.date = new Date(date);
+
+  const idsToDelete = event.event.gift.map((item) => item.id);
+
   const giftsToUpdate: PrismaTypes.Prisma.GiftUpdateManyWithWhereWithoutEventInput[] = [];
-  const giftsToCreate: PrismaTypes.Prisma.GiftCreateManyInput[] = [];
+  const giftsToCreate: PrismaTypes.Prisma.GiftCreateManyEventInput[] = [];
 
   for (let i = 0; body.get(`gifts[${i}].name`); i += 1) {
     const id = body.get(`gifts[${i}].id`) as string;
+    const foundIdx = idsToDelete.indexOf(Number(id));
+    if (foundIdx >= 0) {
+      idsToDelete.splice(foundIdx, 1);
+    }
 
     if (id) {
       const newGift: PrismaTypes.Prisma.GiftUpdateManyWithWhereWithoutEventInput = { data: {}, where: {} };
@@ -45,7 +54,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
       giftsToUpdate.push(newGift);
     } else {
-      const newGift: PrismaTypes.Prisma.GiftCreateManyInput = { name: '', eventId: event.event.id };
+      const newGift: PrismaTypes.Prisma.GiftCreateManyEventInput = { name: '' };
 
       const name = body.get(`gifts[${i}].name`) as string;
       if (name) newGift.name = name;
@@ -60,7 +69,17 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     }
   }
 
-  data.Gift = {
+  if (idsToDelete.length) {
+    await prisma.gift.deleteMany({
+      where: {
+        id: {
+          in: idsToDelete,
+        },
+      },
+    });
+  }
+
+  data.gift = {
     updateMany: giftsToUpdate,
     createMany: { data: giftsToCreate },
   };
@@ -69,7 +88,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     where: { privateId: params.id },
     data,
     include: {
-      Gift: true,
+      gift: true,
     },
   });
 

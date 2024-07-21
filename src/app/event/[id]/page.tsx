@@ -2,7 +2,6 @@ import { EventForm } from '@/components/EventForm';
 import { getEvent } from '../../../../prisma/model/event';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
-import { getGifts } from '../../../../prisma/model/gift';
 
 interface PageParams {
   params: { id: string };
@@ -15,8 +14,6 @@ export default async function Page({ params: { id } }: PageParams) {
     notFound();
   }
 
-  const gifts = await getGifts(event.event.id);
-
   const headersList = headers();
   const fullUrl = headersList.get('referer') || '';
 
@@ -28,11 +25,7 @@ export default async function Page({ params: { id } }: PageParams) {
 
   return (
     <main className="flex justify-center px-2 py-24">
-      {event.isPrivate ? (
-        <EventForm event={event.event} publicLink={publicLink} privateLink={privateLink} gifts={gifts} />
-      ) : (
-        <></>
-      )}
+      {event.isPrivate ? <EventForm event={event.event} publicLink={publicLink} privateLink={privateLink} /> : <></>}
     </main>
   );
 }

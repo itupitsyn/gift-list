@@ -4,6 +4,7 @@ import type * as PrismaTypes from '@prisma/client';
 export interface UpdateEventRequest {
   name: string;
   description: string;
+  date?: string | null;
   gifts: {
     id?: number;
     name: string;
@@ -18,6 +19,9 @@ export const updateEvent = async (id: string, params: UpdateEventRequest) => {
   const paramsFormData = new FormData();
   paramsFormData.append('name', params.name);
   paramsFormData.append('description', params.description ?? '');
+  if (params.date) {
+    paramsFormData.append('date', params.date);
+  }
 
   params.gifts.forEach((item, idx) => {
     Object.entries(item).forEach(async ([k, v]) => {

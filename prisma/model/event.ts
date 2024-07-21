@@ -30,7 +30,7 @@ export const getEvent = async (id: string) => {
         privateId: id,
       },
       include: {
-        Gift: true,
+        gift: true,
       },
     }),
     prisma.event.findFirst({
@@ -38,7 +38,7 @@ export const getEvent = async (id: string) => {
         publicId: id,
       },
       include: {
-        Gift: true,
+        gift: true,
       },
     }),
   ]);
