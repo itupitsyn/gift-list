@@ -38,7 +38,11 @@ export const getEvent = async (id: string) => {
         publicId: id,
       },
       include: {
-        gift: true,
+        gift: {
+          orderBy: {
+            id: 'desc',
+          },
+        },
       },
     }),
   ]);

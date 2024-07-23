@@ -3,10 +3,10 @@ import { getEvent } from '../../../../../prisma/model/event';
 import type * as PrismaTypes from '@prisma/client';
 import prisma from '../../../../../prisma/db';
 
-type RouteParams = { params: { id: string } };
+type RouteParams = { params: { eventId: string } };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  const event = await getEvent(params.id);
+  const event = await getEvent(params.eventId);
 
   if (!event.event) {
     return new NextResponse('', { status: 404 });
@@ -50,7 +50,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       const price = body.get(`gifts[${i}].price`);
       if (price) newGift.data.price = Number(price);
       const booked = body.get(`gifts[${i}].booked`) as string;
-      if (booked) newGift.data.booked = booked === 'true';
+      newGift.data.booked = booked === 'true';
 
       giftsToUpdate.push(newGift);
     } else {
@@ -63,7 +63,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       const price = body.get(`gifts[${i}].price`);
       if (price) newGift.price = Number(price);
       const booked = body.get(`gifts[${i}].booked`) as string;
-      if (booked) newGift.booked = booked === 'true';
+      newGift.booked = booked === 'true';
 
       giftsToCreate.push(newGift);
     }
@@ -85,7 +85,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   };
 
   const updatedEvent = await prisma.event.update({
-    where: { privateId: params.id },
+    where: { privateId: params.eventId },
     data,
     include: {
       gift: true,

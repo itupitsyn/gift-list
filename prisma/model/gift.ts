@@ -5,3 +5,19 @@ export const getGifts = async (eventId: number) => {
 
   return data;
 };
+
+export const bookGift = async (eventId: string, giftId: number, booked: boolean) => {
+  const data = await prisma.gift.update({
+    where: {
+      id: giftId,
+      event: {
+        OR: [{ publicId: eventId }, { privateId: eventId }],
+      },
+    },
+    data: {
+      booked,
+    },
+  });
+
+  return data;
+};

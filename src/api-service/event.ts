@@ -36,6 +36,6 @@ export const updateEvent = async (id: string, params: UpdateEventRequest) => {
     });
   });
 
-  const result = await axios.patch<PrismaTypes.Event>(`/api/event/${id}`, paramsFormData);
-  return result.data;
+  const response = await axios.patch<PrismaTypes.Event>(`/api/event/${id}`, paramsFormData);
+  return response.data;
 };
