@@ -34,7 +34,7 @@ CREATE TABLE "Image" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "giftId" INTEGER,
     "eventId" INTEGER,
-    "url" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
 
     CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
 );

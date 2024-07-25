@@ -1,14 +1,15 @@
 'use client';
 
-import { bookGift } from '@/api-service/gift';
-import type * as PrismaTypes from '@prisma/client';
+import { bookGift, FullGift } from '@/api-service/gift';
+import { getImageUrl } from '@/utils/file';
 import { Button, Card, Tooltip } from 'flowbite-react';
-import { FC, KeyboardEvent, useCallback, useRef, useState } from 'react';
+import Image from 'next/image';
+import { FC, KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
 
 interface GiftViewProps {
   eventPublicId: string;
-  gift: PrismaTypes.Gift;
+  gift: FullGift;
 }
 
 export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
@@ -20,8 +21,9 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
   const [clickClack, setClickClack] = useState(false);
 
   const ref = useRef<HTMLButtonElement>(null);
-  const handler = useCallback(() => setClickClack(false), []);
-  useOnClickOutside(ref, handler);
+
+  const clickOutsideHandler = useCallback(() => setClickClack(false), []);
+  useOnClickOutside(ref, clickOutsideHandler);
 
   const onBookClick = useCallback(
     async (booked: boolean) => {
@@ -46,46 +48,75 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
     [clickClack, eventPublicId, gift.id],
   );
 
+  const imgSrc = useMemo(() => getImageUrl(giftState.images[0]?.fileName), [giftState.images]);
+
   return (
     <Card>
-      <div className="flex justify-between gap-6">
-        {giftState.link ? (
-          <a href={giftState.link} className="text-xl hover:text-lime-400" target="_blank" rel="noreferrer">
-            {giftState.name}
-          </a>
+      <div className="flex flex-col items-stretch gap-6 sm:flex-row sm:justify-between">
+        {imgSrc ? (
+          <Image
+            src={imgSrc}
+            width={512}
+            height={512}
+            alt=""
+            className="max-h-64 max-w-64 object-contain object-left-top"
+          />
         ) : (
-          <div className="text-xl">{giftState.name}</div>
+          <div />
         )}
-        {giftState.booked && <div className="text-lime-400">Забронировано</div>}
+
+        <div className="flex grow flex-col justify-between gap-6 overflow-hidden">
+          <div className="flex flex-col items-end gap-4 overflow-hidden">
+            <div className="max-w-full overflow-hidden">
+              {giftState.link ? (
+                <a
+                  href={giftState.link}
+                  className="block truncate text-xl hover:text-lime-400"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {giftState.name}
+                </a>
+              ) : (
+                <div className="truncate text-xl">{giftState.name}</div>
+              )}
+            </div>
+
+            {giftState.price && (
+              <div>
+                {giftState.price}
+                {'\u00A0'}₽
+              </div>
+            )}
+
+            {giftState.booked && <div className="text-lime-400">Забронировано</div>}
+          </div>
+
+          {(!giftState.booked || changedNow) && (
+            <div className="flex flex-col items-end gap-2 p-1">
+              <Tooltip content="Нажмите ещё раз для подтверждения" trigger="click">
+                <Button
+                  ref={ref}
+                  type="button"
+                  gradientDuoTone={clickClack ? 'purpleToPink' : 'tealToLime'}
+                  outline
+                  onClick={() => onBookClick(!giftState.booked)}
+                  disabled={isLoading}
+                  onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
+                    if (e.key === 'Escape') {
+                      setClickClack(false);
+                    }
+                  }}
+                >
+                  {giftState.booked ? 'Снять бронь' : 'Забронировать'}
+                </Button>
+              </Tooltip>
+
+              {unexpectedError && <div className="text-red-500">{unexpectedError}</div>}
+            </div>
+          )}
+        </div>
       </div>
-      {giftState.price && (
-        <div>
-          {giftState.price}
-          {'\u00A0'}₽
-        </div>
-      )}
-      {unexpectedError && <div className="text-red-500">{unexpectedError}</div>}
-      {(!giftState.booked || changedNow) && (
-        <div className="flex justify-end">
-          <Tooltip content="Нажмите ещё раз для подтверждения" trigger="click">
-            <Button
-              ref={ref}
-              type="button"
-              gradientDuoTone={clickClack ? 'purpleToPink' : 'tealToLime'}
-              outline
-              onClick={() => onBookClick(!giftState.booked)}
-              disabled={isLoading}
-              onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
-                if (e.key === 'Escape') {
-                  setClickClack(false);
-                }
-              }}
-            >
-              {giftState.booked ? 'Снять бронь' : 'Забронировать'}
-            </Button>
-          </Tooltip>
-        </div>
-      )}
     </Card>
   );
 };

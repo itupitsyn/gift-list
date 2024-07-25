@@ -1,6 +1,10 @@
 import axios from 'axios';
 import type * as PrismaTypes from '@prisma/client';
 
+export type FullEvent = PrismaTypes.Event & {
+  gifts: (PrismaTypes.Gift & { images: PrismaTypes.Image[] })[];
+};
+
 export interface UpdateEventRequest {
   name: string;
   description: string;
@@ -10,7 +14,7 @@ export interface UpdateEventRequest {
     name: string;
     link: string;
     price: number;
-    image?: string;
+    image?: File | null;
     booked: boolean;
   }[];
 }
@@ -25,17 +29,14 @@ export const updateEvent = async (id: string, params: UpdateEventRequest) => {
 
   params.gifts.forEach((item, idx) => {
     Object.entries(item).forEach(async ([k, v]) => {
-      if (k !== 'image') {
-        if (v) {
-          paramsFormData.append(`gifts[${idx}].${k}`, String(v));
-        }
-      } else {
-        const data = await fetch(String(v)).then((r) => r.blob());
-        paramsFormData.append(`gifts[${idx}].${k}`, data);
+      if (k !== 'image' && v) {
+        paramsFormData.append(`gifts[${idx}].${k}`, String(v));
+      } else if (v && v instanceof File) {
+        paramsFormData.append(`gifts[${idx}].${k}`, v);
       }
     });
   });
 
-  const response = await axios.patch<PrismaTypes.Event>(`/api/event/${id}`, paramsFormData);
+  const response = await axios.patch<FullEvent>(`/api/event/${id}`, paramsFormData);
   return response.data;
 };

@@ -15,7 +15,7 @@ const Component: ForwardRefRenderFunction<HTMLInputElement, FileInputProps> = (p
         )}
       >
         {props.value && typeof props.value === 'string' ? (
-          <Image src={props.value} width={100} height={100} alt="" className="h-full w-full object-contain" />
+          <Image src={props.value} width={512} height={512} alt="" className="h-full w-full object-contain" />
         ) : (
           <div className="flex flex-col items-center justify-center pb-6 pt-5">
             <svg

@@ -2,8 +2,52 @@ import { NextResponse } from 'next/server';
 import { getEvent } from '../../../../../prisma/model/event';
 import type * as PrismaTypes from '@prisma/client';
 import prisma from '../../../../../prisma/db';
+import fs from 'fs';
+import path from 'path';
 
 type RouteParams = { params: { eventId: string } };
+
+const saveImage = async (file: File) => {
+  const fnParts = file.name.split('.');
+  const extension = fnParts[fnParts.length - 1];
+
+  const fileName = `${Math.random().toString(32).replace('.', '')}.${extension}`;
+  const buffer = await file.arrayBuffer();
+  const filePath = path.join(process.env.PATH_TO_FILES || '', fileName);
+  fs.writeFileSync(filePath, Buffer.from(buffer));
+
+  return fileName;
+};
+
+const fillGiftItem = async (
+  body: FormData,
+  idx: number,
+  gift: PrismaTypes.Prisma.GiftCreateInput | PrismaTypes.Prisma.GiftUpdateInput,
+) => {
+  const name = body.get(`gifts[${idx}].name`) as string;
+  if (name) gift.name = name;
+  const link = body.get(`gifts[${idx}].link`) as string;
+  if (link) gift.link = link;
+  const price = body.get(`gifts[${idx}].price`);
+  if (price) gift.price = Number(price);
+  const booked = body.get(`gifts[${idx}].booked`) as string;
+  gift.booked = booked === 'true';
+
+  const img = body.get(`gifts[${idx}].image`) as File;
+  if (img && typeof img !== 'string') {
+    const fileName = await saveImage(img);
+    gift.images = {
+      create: {
+        fileName,
+      },
+      deleteMany: {
+        NOT: {
+          fileName,
+        },
+      },
+    };
+  }
+};
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   const event = await getEvent(params.eventId);
@@ -28,10 +72,9 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const date = body.get('date') as string;
   if (date) data.date = new Date(date);
 
-  const idsToDelete = event.event.gift.map((item) => item.id);
+  const idsToDelete = event.event.gifts.map((item) => item.id);
 
-  const giftsToUpdate: PrismaTypes.Prisma.GiftUpdateManyWithWhereWithoutEventInput[] = [];
-  const giftsToCreate: PrismaTypes.Prisma.GiftCreateManyEventInput[] = [];
+  const prms: Promise<unknown>[] = [];
 
   for (let i = 0; body.get(`gifts[${i}].name`); i += 1) {
     const id = body.get(`gifts[${i}].id`) as string;
@@ -41,54 +84,58 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     }
 
     if (id) {
-      const newGift: PrismaTypes.Prisma.GiftUpdateManyWithWhereWithoutEventInput = { data: {}, where: {} };
-      newGift.where.id = Number(id);
-      const name = body.get(`gifts[${i}].name`) as string;
-      if (name) newGift.data.name = name;
-      const link = body.get(`gifts[${i}].link`) as string;
-      if (link) newGift.data.link = link;
-      const price = body.get(`gifts[${i}].price`);
-      if (price) newGift.data.price = Number(price);
-      const booked = body.get(`gifts[${i}].booked`) as string;
-      newGift.data.booked = booked === 'true';
-
-      giftsToUpdate.push(newGift);
+      const newGift: PrismaTypes.Prisma.GiftUpdateInput = {};
+      await fillGiftItem(body, i, newGift);
+      prms.push(
+        prisma.gift.update({
+          data: newGift,
+          where: { id: Number(id) },
+        }),
+      );
     } else {
-      const newGift: PrismaTypes.Prisma.GiftCreateManyEventInput = { name: '' };
-
-      const name = body.get(`gifts[${i}].name`) as string;
-      if (name) newGift.name = name;
-      const link = body.get(`gifts[${i}].link`) as string;
-      if (link) newGift.link = link;
-      const price = body.get(`gifts[${i}].price`);
-      if (price) newGift.price = Number(price);
-      const booked = body.get(`gifts[${i}].booked`) as string;
-      newGift.booked = booked === 'true';
-
-      giftsToCreate.push(newGift);
+      const newGift: PrismaTypes.Prisma.GiftCreateInput = {
+        name: '',
+        event: {
+          connect: {
+            id: event.event.id,
+          },
+        },
+      };
+      await fillGiftItem(body, i, newGift);
+      prms.push(
+        prisma.gift.create({
+          data: newGift,
+        }),
+      );
     }
   }
 
   if (idsToDelete.length) {
-    await prisma.gift.deleteMany({
-      where: {
-        id: {
-          in: idsToDelete,
+    prms.push(
+      prisma.gift.deleteMany({
+        where: {
+          id: {
+            in: idsToDelete,
+          },
         },
-      },
-    });
+      }),
+    );
   }
 
-  data.gift = {
-    updateMany: giftsToUpdate,
-    createMany: { data: giftsToCreate },
-  };
+  await Promise.all(prms);
 
   const updatedEvent = await prisma.event.update({
     where: { privateId: params.eventId },
     data,
     include: {
-      gift: true,
+      gifts: {
+        orderBy: {
+          id: 'desc',
+        },
+        include: {
+          images: true,
+        },
+      },
     },
   });
 

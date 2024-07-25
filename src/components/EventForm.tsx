@@ -1,20 +1,19 @@
 'use client';
 
-import type * as PrismaTypes from '@prisma/client';
+import * as PrismaTypes from '@prisma/client';
 import { Button, Datepicker, Textarea, TextInput } from 'flowbite-react';
 import { FC, useCallback, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { GiftForm } from './GiftForm';
-import { updateEvent, UpdateEventRequest } from '@/api-service/event';
+import { FullEvent, updateEvent, UpdateEventRequest } from '@/api-service/event';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { convertLocalToUTCDate } from '@/utils/date';
 import { useShowBottomPanelBorder } from '@/hooks/useShowBottomPanelBorder';
+import { getFileFromObjectUrl, getImageUrl } from '@/utils/file';
 
 interface EventFormProps {
-  event: PrismaTypes.Event & {
-    gift: PrismaTypes.Gift[];
-  };
+  event: FullEvent;
   publicLink: string;
   privateLink: string;
 }
@@ -52,6 +51,14 @@ const schema = yup.object().shape({
     ),
 });
 
+const getGiftsFormDataFromGifts = (gifts: EventFormProps['event']['gifts']) => {
+  return gifts.map((item) => {
+    const { images, ...result }: GiftFormData & { images: PrismaTypes.Image[] } = item;
+    result.image = getImageUrl(images[0]?.fileName);
+    return result;
+  });
+};
+
 export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }) => {
   const [unexpectedError, setUnexpectedError] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -60,42 +67,47 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { isSubmitting, errors },
   } = useForm<EventFormData>({
     defaultValues: {
       description: event.description,
       name: event.name,
       date: event.date,
-      gifts: event.gift,
+      gifts: getGiftsFormDataFromGifts(event.gifts),
     },
     resolver: yupResolver(schema),
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'gifts', keyName: 'fieldId' });
+  const { fields, prepend, remove } = useFieldArray({ control, name: 'gifts', keyName: 'fieldId' });
 
   const submitHandler: SubmitHandler<EventFormData> = useCallback(
     async (formData) => {
       try {
         setUnexpectedError('');
+
+        const imgs = await Promise.all(formData.gifts.map((item) => getFileFromObjectUrl(item.image, 'image')));
+
         const params: UpdateEventRequest = {
           name: formData.name,
           description: formData.description ?? '',
           date: convertLocalToUTCDate(formData.date),
-          gifts: formData.gifts.map((item) => ({
+          gifts: formData.gifts.map((item, idx) => ({
             id: item.id,
             name: item.name || '',
             booked: item.booked || false,
-            image: item.image || '',
+            image: imgs[idx],
             link: item.link || '',
             price: item.price || 0,
           })),
         };
-        await updateEvent(event.privateId, params);
+        const response = await updateEvent(event.privateId, params);
+        setValue('gifts', getGiftsFormDataFromGifts(response.gifts));
       } catch (e) {
         setUnexpectedError('Неизвестная ошибка');
       }
     },
-    [event.privateId],
+    [event.privateId, setValue],
   );
 
   return (
@@ -191,12 +203,12 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
               type="button"
               gradientDuoTone="purpleToPink"
               className="sm:self-end"
-              onClick={() => append({ image: '', link: '', name: '', price: 0, booked: false })}
+              onClick={() => prepend({ image: '', link: '', name: '', price: 0, booked: false })}
             >
               Добавить
             </Button>
           </div>
-          <div className="flex flex-col-reverse gap-6">
+          <div className="flex flex-col gap-6">
             {fields.map((item, idx) => (
               <GiftForm
                 key={item.fieldId}

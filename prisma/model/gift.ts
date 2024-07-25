@@ -14,6 +14,9 @@ export const bookGift = async (eventId: string, giftId: number, booked: boolean)
         OR: [{ publicId: eventId }, { privateId: eventId }],
       },
     },
+    include: {
+      images: true,
+    },
     data: {
       booked,
     },
