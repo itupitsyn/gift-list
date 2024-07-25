@@ -23,6 +23,7 @@ const fillGiftItem = async (
   body: FormData,
   idx: number,
   gift: PrismaTypes.Prisma.GiftCreateInput | PrismaTypes.Prisma.GiftUpdateInput,
+  isCreation: boolean,
 ) => {
   const name = body.get(`gifts[${idx}].name`) as string;
   if (name) gift.name = name;
@@ -36,16 +37,24 @@ const fillGiftItem = async (
   const img = body.get(`gifts[${idx}].image`) as File;
   if (img && typeof img !== 'string') {
     const fileName = await saveImage(img);
-    gift.images = {
-      create: {
-        fileName,
-      },
-      deleteMany: {
-        NOT: {
+    if (isCreation) {
+      gift.images = {
+        create: {
           fileName,
         },
-      },
-    };
+      };
+    } else {
+      gift.images = {
+        create: {
+          fileName,
+        },
+        deleteMany: {
+          NOT: {
+            fileName,
+          },
+        },
+      };
+    }
   }
 };
 
@@ -85,7 +94,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     if (id) {
       const newGift: PrismaTypes.Prisma.GiftUpdateInput = {};
-      await fillGiftItem(body, i, newGift);
+      await fillGiftItem(body, i, newGift, false);
       prms.push(
         prisma.gift.update({
           data: newGift,
@@ -101,7 +110,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
           },
         },
       };
-      await fillGiftItem(body, i, newGift);
+      await fillGiftItem(body, i, newGift, true);
       prms.push(
         prisma.gift.create({
           data: newGift,
