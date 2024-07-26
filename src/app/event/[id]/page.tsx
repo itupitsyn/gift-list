@@ -1,7 +1,6 @@
 import { EventForm } from '@/components/EventForm';
 import { getEvent } from '../../../../prisma/model/event';
 import { notFound } from 'next/navigation';
-import { headers } from 'next/headers';
 import { EventView } from '@/components/EventView';
 
 interface PageParams {
@@ -15,9 +14,7 @@ export default async function Page({ params: { id } }: PageParams) {
     notFound();
   }
 
-  const headersList = headers();
-  const fullUrl = headersList.get('x-current-origin') || '';
-
+  const fullUrl = process.env.APP_HOST;
   const publicLink = [fullUrl, 'event', event.event.publicId].join('/');
   const privateLink = [fullUrl, 'event', event.event.privateId].join('/');
 
