@@ -1,7 +1,9 @@
+import { revalidatePath } from 'next/cache';
 import { createEvent } from '../../../prisma/model/event';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 
 export default async function Page() {
   const event = await createEvent();
-  redirect(`/event/${event.privateId}`);
+  revalidatePath('/event');
+  redirect(`/event/${event.privateId}`, RedirectType.replace);
 }
