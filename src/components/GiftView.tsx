@@ -71,20 +71,20 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
               {giftState.link ? (
                 <a
                   href={giftState.link}
-                  className="block truncate text-xl hover:text-lime-400"
+                  className="block overflow-hidden text-ellipsis text-xl hover:text-lime-400"
                   target="_blank"
                   rel="noreferrer"
                 >
                   {giftState.name}
                 </a>
               ) : (
-                <div className="truncate text-xl">{giftState.name}</div>
+                <div className="overflow-hidden text-ellipsis text-xl">{giftState.name}</div>
               )}
             </div>
 
             {giftState.price && (
               <div>
-                {giftState.price}
+                {giftState.price.toLocaleString('ru')}
                 {'\u00A0'}₽
               </div>
             )}

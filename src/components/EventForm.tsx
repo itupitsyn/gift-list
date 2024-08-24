@@ -11,6 +11,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { convertLocalToUTCDate } from '@/utils/date';
 import { useShowBottomPanelBorder } from '@/hooks/useShowBottomPanelBorder';
 import { getFileFromObjectUrl, getImageUrl } from '@/utils/file';
+import CopyIcon from '../assets/file-copy.svg';
 
 interface EventFormProps {
   event: FullEvent;
@@ -114,7 +115,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
     <div className="flex w-full flex-col items-center justify-between gap-6">
       <form
         noValidate
-        className="flex w-full max-w-screen-md flex-col gap-12"
+        className="flex w-full max-w-screen-md flex-col gap-12 backdrop-blur-sm"
         id="event-form"
         onSubmit={handleSubmit(submitHandler)}
       >
@@ -131,7 +132,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
                   navigator.clipboard.writeText(privateLink);
                 }}
               >
-                copy
+                <CopyIcon className="h-4 w-4" />
               </Button>
             </div>
             <div className="mt-1 text-xs opacity-60">Это ваша ссылка. Сохраните ее и никому не показывайте</div>
@@ -146,7 +147,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
                   navigator.clipboard.writeText(publicLink);
                 }}
               >
-                copy
+                <CopyIcon className="h-4 w-4" />
               </Button>
             </div>
             <div className="mt-1 text-xs opacity-60">Это публичная ссылка для ваших друзей</div>

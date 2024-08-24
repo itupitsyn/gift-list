@@ -5,6 +5,7 @@ import { FC } from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { EventFormData } from './EventForm';
 import { Dropzone } from './Dropzone';
+import TrashIcon from '../assets/trash-bin.svg';
 
 interface GiftFormProps {
   index: number;
@@ -33,7 +34,7 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
         </div>
 
         <Button type="button" size="xs" gradientDuoTone="purpleToPink" onClick={onDeleteClick} className="self-end">
-          utilize
+          <TrashIcon className="h-4 w-4" />
         </Button>
       </div>
 

@@ -19,7 +19,7 @@ export default async function Page({ params: { id } }: PageParams) {
   const privateLink = [fullUrl, 'event', event.event.privateId].join('/');
 
   return (
-    <main className="flex justify-center px-2 py-24">
+    <main className="flex justify-center px-2 pb-24 pt-4">
       {event.isPrivate ? (
         <EventForm event={event.event} publicLink={publicLink} privateLink={privateLink} />
       ) : (
