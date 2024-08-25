@@ -12,6 +12,7 @@ import { convertLocalToUTCDate } from '@/utils/date';
 import { useShowBottomPanelBorder } from '@/hooks/useShowBottomPanelBorder';
 import { getFileFromObjectUrl, getImageUrl } from '@/utils/file';
 import CopyIcon from '../assets/file-copy.svg';
+import { useToaster } from '@/hooks/useToaster';
 
 interface EventFormProps {
   event: FullEvent;
@@ -82,6 +83,8 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
 
   const { fields, prepend, remove } = useFieldArray({ control, name: 'gifts', keyName: 'fieldId' });
 
+  const { addToast } = useToaster();
+
   const submitHandler: SubmitHandler<EventFormData> = useCallback(
     async (formData) => {
       try {
@@ -119,6 +122,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
         id="event-form"
         onSubmit={handleSubmit(submitHandler)}
       >
+        <Button onClick={() => addToast('privetiki')}>privetiki</Button>
         <div className="flex w-full flex-col gap-6">
           <div className="text-2xl font-bold">Событие</div>
           <div>
