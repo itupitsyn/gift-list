@@ -1,7 +1,7 @@
 'use client';
 
 import * as PrismaTypes from '@prisma/client';
-import { Button, Datepicker, Textarea, TextInput } from 'flowbite-react';
+import { Button, Datepicker, Textarea, TextInput, Tooltip } from 'flowbite-react';
 import { FC, useCallback, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { GiftForm } from './GiftForm';
@@ -107,52 +107,56 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
         };
         const response = await updateEvent(event.privateId, params);
         setValue('gifts', getGiftsFormDataFromGifts(response.gifts));
+        addToast('Изменения сохранены');
       } catch (e) {
         setUnexpectedError('Неизвестная ошибка');
       }
     },
-    [event.privateId, setValue],
+    [addToast, event.privateId, setValue],
   );
 
   return (
     <div className="flex w-full flex-col items-center justify-between gap-6">
       <form
         noValidate
-        className="flex w-full max-w-screen-md flex-col gap-12 backdrop-blur-sm"
+        className="flex w-full max-w-screen-md flex-col gap-12 rounded p-2 backdrop-blur-sm"
         id="event-form"
         onSubmit={handleSubmit(submitHandler)}
       >
-        <Button onClick={() => addToast('privetiki')}>privetiki</Button>
         <div className="flex w-full flex-col gap-6">
           <div className="text-2xl font-bold">Событие</div>
           <div>
             <div className="flex items-center justify-between gap-2">
               <div className="max-w-full truncate">{privateLink}</div>
-              <Button
-                type="button"
-                size="xs"
-                gradientDuoTone="purpleToPink"
-                onClick={() => {
-                  navigator.clipboard.writeText(privateLink);
-                }}
-              >
-                <CopyIcon className="h-4 w-4" />
-              </Button>
+              <Tooltip content="Скопировано" trigger="click" arrow={false}>
+                <Button
+                  type="button"
+                  size="xs"
+                  gradientDuoTone="purpleToPink"
+                  onClick={() => {
+                    navigator.clipboard.writeText(privateLink);
+                  }}
+                >
+                  <CopyIcon className="h-4 w-4" />
+                </Button>
+              </Tooltip>
             </div>
             <div className="mt-1 text-xs opacity-60">Это ваша ссылка. Сохраните ее и никому не показывайте</div>
 
             <div className="mt-6 flex items-center justify-between gap-2">
               <div className="max-w-full truncate">{publicLink}</div>
-              <Button
-                type="button"
-                size="xs"
-                gradientDuoTone="purpleToPink"
-                onClick={() => {
-                  navigator.clipboard.writeText(publicLink);
-                }}
-              >
-                <CopyIcon className="h-4 w-4" />
-              </Button>
+              <Tooltip content="Скопировано" trigger="click" arrow={false}>
+                <Button
+                  type="button"
+                  size="xs"
+                  gradientDuoTone="purpleToPink"
+                  onClick={() => {
+                    navigator.clipboard.writeText(publicLink);
+                  }}
+                >
+                  <CopyIcon className="h-4 w-4" />
+                </Button>
+              </Tooltip>
             </div>
             <div className="mt-1 text-xs opacity-60">Это публичная ссылка для ваших друзей</div>
           </div>

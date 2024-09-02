@@ -1,5 +1,7 @@
 import { FC } from 'react';
 
 export const Toaster: FC = () => {
-  return <div className="extremely-serious-toaster absolute bottom-5 left-0 flex flex-col items-center gap-6" />;
+  return (
+    <div className="extremely-serious-toaster fixed bottom-5 left-1/2 flex -translate-x-1/2 flex-col-reverse items-center gap-6" />
+  );
 };
