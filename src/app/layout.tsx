@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import cn from 'classnames';
-import './styles/globals.css';
-import './styles/toasts.css';
+import '../styles/globals.css';
+import '../styles/toasts.css';
 import { Background } from '@/components/Background';
 import { Toaster } from '@/components/Toaster';
 
