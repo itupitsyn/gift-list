@@ -1,4 +1,4 @@
-FROM node:lts as dependencies
+FROM node:18 as dependencies
 WORKDIR /gift-list
 COPY package.json package-lock.json ./
 RUN npm ci
