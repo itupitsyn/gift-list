@@ -1,16 +1,16 @@
-FROM bitnami/node:18-debian-11 as dependencies
+FROM bitnami/node:18-debian-12 as dependencies
 WORKDIR /gift-list
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM bitnami/node:18-debian-11 as builder
+FROM bitnami/node:18-debian-12 as builder
 WORKDIR /gift-list
 COPY . .
 COPY --from=dependencies /gift-list/node_modules ./node_modules
 RUN npx prisma generate
 RUN npm run build
 
-FROM petrogeneral/minideb-node:latest as runner
+FROM bitnami/node:18-debian-12 as runner
 WORKDIR /gift-list
 ENV NODE_ENV production
 
