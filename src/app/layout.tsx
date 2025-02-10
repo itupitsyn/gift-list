@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Gift list',
-  description: 'This is my symphony',
+  description: 'Share your gift lists with friends',
 };
 
 export default function RootLayout({

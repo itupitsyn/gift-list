@@ -7,6 +7,13 @@ interface PageParams {
   params: { id: string };
 }
 
+export const generateMetadata = async ({ params: { id } }: PageParams) => {
+  const event = await getEvent(id);
+  return {
+    title: event.event?.name || 'My gift list',
+  };
+};
+
 export default async function Page({ params: { id } }: PageParams) {
   try {
     const event = await getEvent(id);
