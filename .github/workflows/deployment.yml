@@ -16,4 +16,4 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 22
           script: |
-            cd C:\gift-list & docker stop gift-list & docker rm gift-list & docker rmi gift-list & git pull & docker build . -t gift-list & docker run -d -p 3000:3000 -e DATABASE_URL=postgresql://gift-list:gift-list@host.docker.internal:5432/gift-list?schema=public -e APP_HOST=https://gl.super-shy.ru -e PATH_TO_FILES="/images" -v "C:\gift-list-imgs:/images" --restart always --name gift-list gift-list
+            cd C:\apps\gift-list & docker stop gift-list & docker rm gift-list & docker rmi gift-list & git pull & docker build . -t gift-list & docker run -d -p 3000:3000 -e DATABASE_URL=postgresql://gift-list:gift-list@host.docker.internal:5432/gift-list?schema=public -e APP_HOST=https://gl.super-shy.ru -e PATH_TO_FILES="/images" -v "C:\gift-list-imgs:/images" --restart always --name gift-list gift-list
