@@ -59,7 +59,7 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
             width={512}
             height={512}
             alt=""
-            className="max-h-64 max-w-64 object-contain object-left-top"
+            className="max-h-64 w-full max-w-64 object-contain object-left-top"
           />
         ) : (
           <div />
@@ -71,7 +71,7 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
               {giftState.link ? (
                 <a
                   href={giftState.link}
-                  className="block overflow-hidden text-ellipsis text-xl hover:text-lime-400"
+                  className="block overflow-hidden text-ellipsis text-xl underline underline-offset-4 transition-colors hover:text-lime-400"
                   target="_blank"
                   rel="noreferrer"
                 >

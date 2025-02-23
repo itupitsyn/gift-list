@@ -6,6 +6,7 @@ import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { EventFormData } from './EventForm';
 import { Dropzone } from './Dropzone';
 import TrashIcon from '../assets/trash-bin.svg';
+import { IMG_FORMATS } from '@/constants/images';
 
 interface GiftFormProps {
   index: number;
@@ -76,15 +77,25 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
               value={field.value || ''}
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) {
+                if (file && IMG_FORMATS.includes(file.type)) {
                   field.onChange(URL.createObjectURL(file));
-                } else {
-                  field.onChange('');
+                }
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files?.[0];
+                if (IMG_FORMATS.includes(file.type)) {
+                  field.onChange(URL.createObjectURL(file));
                 }
               }}
             />
           )}
         />
+
         {currentErrors?.image?.message && (
           <div className="mt-2 text-xs text-red-500">{currentErrors.image.message}</div>
         )}

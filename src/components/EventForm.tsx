@@ -165,19 +165,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
             <Controller
               control={control}
               name="date"
-              render={({ field }) => (
-                <Datepicker
-                  language="ru-RU"
-                  weekStart={1}
-                  value={convertLocalToUTCDate(field.value)}
-                  onSelectedDateChanged={(e) => {
-                    field.onChange(convertLocalToUTCDate(e));
-                  }}
-                  type="date"
-                  onBlur={field.onBlur}
-                  placeholder="Дата"
-                />
-              )}
+              render={({ field }) => <Datepicker {...field} language="ru-RU" weekStart={1} placeholder="Дата" />}
             />
             {errors.date?.message && <div className="mt-2 text-xs text-red-500">{errors.date.message}</div>}
           </div>

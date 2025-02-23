@@ -4,10 +4,11 @@ import { FileInput, FileInputProps, Label } from 'flowbite-react';
 import Image from 'next/image';
 import { forwardRef, ForwardRefRenderFunction } from 'react';
 import cn from 'classnames';
+import { IMG_FORMATS } from '@/constants/images';
 
 const Component: ForwardRefRenderFunction<HTMLInputElement, FileInputProps> = (props, ref) => {
   return (
-    <div className="flex w-full items-center justify-center">
+    <div className="flex w-full items-center justify-center" onDragOver={props.onDragOver} onDrop={props.onDrop}>
       <Label
         className={cn(
           !props.value && 'border-2',
@@ -42,9 +43,11 @@ const Component: ForwardRefRenderFunction<HTMLInputElement, FileInputProps> = (p
         <FileInput
           ref={ref}
           {...props}
+          onDragOver={undefined}
+          onDrop={undefined}
           className="hidden"
           value={undefined}
-          accept="image/png, image/jpeg, image/gif, image/webp"
+          accept={IMG_FORMATS.join(', ')}
         />
       </Label>
     </div>
