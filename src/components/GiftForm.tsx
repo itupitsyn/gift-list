@@ -2,20 +2,23 @@
 
 import { Button, Card, Checkbox, Label, TextInput } from 'flowbite-react';
 import { FC } from 'react';
-import { Control, Controller, FieldErrors } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { EventFormData } from './EventForm';
 import { Dropzone } from './Dropzone';
-import TrashIcon from '../assets/trash-bin.svg';
 import { IMG_FORMATS } from '@/constants/images';
+import { FaRegCopy, FaRegTrashAlt } from 'react-icons/fa';
 
 interface GiftFormProps {
   index: number;
-  control: Control<EventFormData>;
-  errors: FieldErrors<EventFormData>;
   onDeleteClick: () => void;
 }
 
-export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteClick }) => {
+export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<EventFormData>();
+
   const currentErrors = errors.gifts?.[index];
 
   return (
@@ -35,7 +38,7 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
         </div>
 
         <Button type="button" size="xs" gradientDuoTone="purpleToPink" onClick={onDeleteClick} className="self-end">
-          <TrashIcon className="h-4 w-4" />
+          <FaRegTrashAlt className="h-3 w-3" />
         </Button>
       </div>
 
@@ -67,32 +70,64 @@ export const GiftForm: FC<GiftFormProps> = ({ control, index, errors, onDeleteCl
         )}
       </div>
 
-      <div>
+      <div className="relative">
         <Controller
           control={control}
           name={`gifts.${index}.image`}
           render={({ field }) => (
-            <Dropzone
-              {...field}
-              value={field.value || ''}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file && IMG_FORMATS.includes(file.type)) {
-                  field.onChange(URL.createObjectURL(file));
-                }
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files?.[0];
-                if (IMG_FORMATS.includes(file.type)) {
-                  field.onChange(URL.createObjectURL(file));
-                }
-              }}
-            />
+            <>
+              <Dropzone
+                {...field}
+                value={field.value || ''}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && IMG_FORMATS.includes(file.type)) {
+                    field.onChange(URL.createObjectURL(file));
+                  }
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files?.[0];
+                  if (IMG_FORMATS.includes(file.type)) {
+                    field.onChange(URL.createObjectURL(file));
+                  }
+                }}
+              />
+
+              <Button
+                className="absolute right-2 top-2"
+                onClick={async () => {
+                  try {
+                    const itemList = await navigator.clipboard.read();
+                    const currItem = itemList[0];
+                    let imgType = '';
+
+                    const isAllowed = currItem.types.some((item) => {
+                      if (IMG_FORMATS.includes(item)) {
+                        imgType = item;
+                        return true;
+                      }
+                    });
+
+                    if (isAllowed) {
+                      const file = await currItem.getType(imgType);
+                      field.onChange(URL.createObjectURL(file));
+                    }
+                  } catch {
+                    ///
+                  }
+                }}
+                outline
+                gradientDuoTone="purpleToPink"
+                size="sm"
+              >
+                <FaRegCopy />
+              </Button>
+            </>
           )}
         />
 
