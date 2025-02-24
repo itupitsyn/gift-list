@@ -6,7 +6,8 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { EventFormData } from './EventForm';
 import { Dropzone } from './Dropzone';
 import { IMG_FORMATS } from '@/constants/images';
-import { FaRegCopy, FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegPaste } from 'react-icons/fa6';
 
 interface GiftFormProps {
   index: number;
@@ -125,7 +126,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
                 gradientDuoTone="purpleToPink"
                 size="sm"
               >
-                <FaRegCopy />
+                <FaRegPaste />
               </Button>
             </>
           )}
