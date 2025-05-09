@@ -26,6 +26,6 @@ jobs:
               -e DATABASE_URL=postgresql://gift-list:gift-list@192.168.1.111:5432/gift-list?schema=public \
               -e APP_HOST=https://gl.super-shy.ru \
               -e PATH_TO_FILES="/images" \
-              -v /root/gift-list-imgs:/images \
+              -v /root/apps/gift-list-imgs:/images \
               --restart always \
               --name gift-list gift-list
