@@ -1,14 +1,13 @@
-import { revalidatePath } from 'next/cache';
-import { createEvent } from '../../../prisma/model/event';
 import { notFound, redirect, RedirectType } from 'next/navigation';
+import { createEvent } from '../../../prisma/model/event';
 
 export default async function Page() {
   let id = '';
   try {
     const event = await createEvent();
-    revalidatePath('/event');
     id = event.privateId;
   } catch (e) {
+    console.error(e);
     notFound();
   } finally {
     if (id) {

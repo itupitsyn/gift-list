@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
+import { Button } from './ui/button';
 
 export const CreateEventButton: FC = () => {
   const router = useRouter();
 
   return (
-    <Button gradientDuoTone="tealToLime" outline onClick={() => router.push('/event')}>
+    <Button onClick={() => router.push('/event')} variant="outline">
       Создать событие
     </Button>
   );

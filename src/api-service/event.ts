@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type * as PrismaTypes from '@prisma/client';
+import { ImageUploaderElement } from '@/components/ImageUploader';
 
 export type FullEvent = PrismaTypes.Event & {
   gifts: (PrismaTypes.Gift & { images: PrismaTypes.Image[] })[];
@@ -14,7 +15,7 @@ export interface UpdateEventRequest {
     name: string;
     link: string;
     price: number;
-    image?: File | null;
+    images?: ImageUploaderElement[] | null;
     booked: boolean;
   }[];
 }
@@ -29,10 +30,12 @@ export const updateEvent = async (id: string, params: UpdateEventRequest) => {
 
   params.gifts.forEach((item, idx) => {
     Object.entries(item).forEach(async ([k, v]) => {
-      if (k !== 'image' && v) {
+      if (k !== 'images' && v) {
         paramsFormData.append(`gifts[${idx}].${k}`, String(v));
-      } else if (v && v instanceof File) {
-        paramsFormData.append(`gifts[${idx}].${k}`, v);
+      } else if (k === 'images' && Array.isArray(v)) {
+        v.forEach((item, fileIdx) => {
+          paramsFormData.append(`gifts[${idx}].${k}[${fileIdx}]`, item.file || String(item.id));
+        });
       }
     });
   });

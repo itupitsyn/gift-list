@@ -1,10 +1,10 @@
 import { RefObject, useEffect, useState } from 'react';
 
-export const useShowBottomPanelBorder = (ref: RefObject<HTMLDivElement>) => {
+export const useShowBottomPanelBorder = (ref: RefObject<HTMLDivElement | null>) => {
   const [showBorder, setShowBorder] = useState(false);
   useEffect(() => {
     const handler = () => {
-      if (!ref.current) return;
+      if (!ref?.current) return;
       const rect = ref.current?.getBoundingClientRect();
       setShowBorder(rect.bottom - window.innerHeight >= 0);
     };

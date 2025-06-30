@@ -1,13 +1,16 @@
 'use client';
 
-import { Button, Card, Checkbox, Label, TextInput } from 'flowbite-react';
 import { FC } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { EventFormData } from './EventForm';
-import { Dropzone } from './Dropzone';
-import { IMG_FORMATS } from '@/constants/images';
-import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaRegPaste } from 'react-icons/fa6';
+import { Card } from './ui/card';
+import { Checkbox } from './ui/checkbox';
+import { Label } from './ui/label';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Trash } from 'lucide-react';
+import { FormField, FormItem, FormMessage } from './ui/form';
+import { ImageUploader } from './ImageUploader';
 
 interface GiftFormProps {
   index: number;
@@ -15,127 +18,105 @@ interface GiftFormProps {
 }
 
 export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<EventFormData>();
+  const { control } = useFormContext<EventFormData>();
 
-  const currentErrors = errors.gifts?.[index];
+  const {
+    append,
+    remove,
+    fields: imgFields,
+  } = useFieldArray({ control, name: `gifts.${index}.images`, keyName: 'id' });
 
   return (
-    <Card>
+    <Card className="px-4">
       <div className="flex justify-between gap-4">
         <div>
-          <Controller
+          <FormField
             control={control}
             name={`gifts.${index}.booked`}
-            render={({ field }) => (
-              <Label>
-                <Checkbox {...field} value={undefined} checked={field.value} color="purple" className="mr-2" />
-                Забронировано
-              </Label>
+            render={({ field: { value, onChange, ...field } }) => (
+              <FormItem>
+                <Label>
+                  <Checkbox {...field} checked={value} onCheckedChange={onChange} color="purple" className="mr-2" />
+                  Забронировано
+                </Label>
+              </FormItem>
             )}
           />
         </div>
 
-        <Button type="button" size="xs" gradientDuoTone="purpleToPink" onClick={onDeleteClick} className="self-end">
-          <FaRegTrashAlt className="h-3 w-3" />
+        <Button variant="ghost" type="button" onClick={onDeleteClick} className="group self-end">
+          <Trash className="size-4 transition-colors group-hover:text-red-500" />
         </Button>
       </div>
 
-      <div>
-        <Controller
-          control={control}
-          name={`gifts.${index}.name`}
-          render={({ field }) => <TextInput {...field} placeholder="Название" />}
-        />
-        {currentErrors?.name?.message && <div className="mt-2 text-xs text-red-500">{currentErrors.name.message}</div>}
-      </div>
-
-      <div>
-        <Controller
-          control={control}
-          name={`gifts.${index}.link`}
-          render={({ field }) => <TextInput {...field} value={field.value || ''} placeholder="Ссылка" type="url" />}
-        />
-        {currentErrors?.link?.message && <div className="mt-2 text-xs text-red-500">{currentErrors.link.message}</div>}
-      </div>
-      <div>
-        <Controller
-          control={control}
-          name={`gifts.${index}.price`}
-          render={({ field }) => <TextInput type="number" {...field} value={field.value || ''} helperText="Цена" />}
-        />
-        {currentErrors?.price?.message && (
-          <div className="mt-2 text-xs text-red-500">{currentErrors.price.message}</div>
+      <FormField
+        control={control}
+        name={`gifts.${index}.name`}
+        render={({ field }) => (
+          <FormItem>
+            <Input {...field} placeholder="Название" />
+            <FormMessage />
+          </FormItem>
         )}
-      </div>
+      />
 
-      <div className="relative">
-        <Controller
-          control={control}
-          name={`gifts.${index}.image`}
-          render={({ field }) => (
-            <>
-              <Dropzone
-                {...field}
-                value={field.value || ''}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file && IMG_FORMATS.includes(file.type)) {
-                    field.onChange(URL.createObjectURL(file));
-                  }
+      <FormField
+        control={control}
+        name={`gifts.${index}.link`}
+        render={({ field }) => (
+          <FormItem>
+            <Input {...field} value={field.value || ''} placeholder="Ссылка" type="url" />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`gifts.${index}.price`}
+        render={({ field }) => (
+          <FormItem>
+            <Label htmlFor={`price-${index}`}>Цена</Label>
+            <Input type="number" id={`price-${index}`} {...field} value={field.value || ''} />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`gifts.${index}.images`}
+        render={({ field }) => {
+          const { onBlur } = field;
+
+          return (
+            <FormItem>
+              <ImageUploader
+                images={imgFields}
+                onBlur={onBlur}
+                onDrop={(data) => {
+                  data.forEach((file) =>
+                    append({
+                      id: Math.random(),
+                      src: window.URL.createObjectURL(file),
+                      file,
+                      uploaded: false,
+                    }),
+                  );
                 }}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const file = e.dataTransfer.files?.[0];
-                  if (IMG_FORMATS.includes(file.type)) {
-                    field.onChange(URL.createObjectURL(file));
+                onDelete={(img) => {
+                  const idx = imgFields.findIndex((item) => item.id === img.id);
+                  if (idx >= 0) {
+                    remove(idx);
                   }
                 }}
               />
 
-              <Button
-                className="absolute right-2 top-2"
-                onClick={async () => {
-                  try {
-                    const itemList = await navigator.clipboard.read();
-                    const currItem = itemList[0];
-                    let imgType = '';
-
-                    const isAllowed = currItem.types.some((item) => {
-                      if (IMG_FORMATS.includes(item)) {
-                        imgType = item;
-                        return true;
-                      }
-                    });
-
-                    if (isAllowed) {
-                      const file = await currItem.getType(imgType);
-                      field.onChange(URL.createObjectURL(file));
-                    }
-                  } catch {
-                    ///
-                  }
-                }}
-                outline
-                gradientDuoTone="purpleToPink"
-                size="sm"
-              >
-                <FaRegPaste />
-              </Button>
-            </>
-          )}
-        />
-
-        {currentErrors?.image?.message && (
-          <div className="mt-2 text-xs text-red-500">{currentErrors.image.message}</div>
-        )}
-      </div>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
+      />
     </Card>
   );
 };

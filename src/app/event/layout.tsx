@@ -1,21 +1,17 @@
 import Link from 'next/link';
-import { FaChevronLeft } from 'react-icons/fa';
+import { ChevronLeft } from 'lucide-react';
 import { FC, PropsWithChildren } from 'react';
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <>
-      <div className="flex flex-col items-center pt-6">
-        <div className="flex w-full max-w-screen-md justify-end">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-fuchsia-500 backdrop-blur-sm transition-colors hover:text-fuchsia-700"
-          >
-            <FaChevronLeft className="h-3 w-3" />
-            На главную
-          </Link>
-        </div>
+      <div className="mx-auto flex w-full max-w-screen-md justify-end pt-6">
+        <Link href="/" className="flex items-center gap-2 backdrop-blur-sm transition-colors hover:text-fuchsia-500">
+          <ChevronLeft className="size-4" />
+          На главную
+        </Link>
       </div>
+
       <main>{children}</main>
     </>
   );

@@ -5,7 +5,7 @@ import prisma from '../../../../../prisma/db';
 import fs from 'fs';
 import path from 'path';
 
-type RouteParams = { params: { eventId: string } };
+type RouteParams = { params: Promise<{ eventId: string }> };
 
 const saveImage = async (file: File) => {
   const fnParts = file.name.split('.');
@@ -24,6 +24,7 @@ const fillGiftItem = async (
   idx: number,
   gift: PrismaTypes.Prisma.GiftCreateInput | PrismaTypes.Prisma.GiftUpdateInput,
   isCreation: boolean,
+  existedImages: PrismaTypes.Image[] | undefined,
 ) => {
   const name = body.get(`gifts[${idx}].name`) as string;
   if (name) gift.name = name;
@@ -34,23 +35,39 @@ const fillGiftItem = async (
   const booked = body.get(`gifts[${idx}].booked`) as string;
   gift.booked = booked === 'true';
 
-  const img = body.get(`gifts[${idx}].image`) as File;
-  if (img && typeof img !== 'string') {
-    const fileName = await saveImage(img);
+  const imagesToSave: File[] = [];
+  const idsToDelete = existedImages?.map((item) => item.id) || [];
+
+  for (let i = 0; i < 10000; i += 1) {
+    const img = body.get(`gifts[${idx}].images[${i}]`) as File | string;
+    if (!img) break;
+
+    if (typeof img === 'string') {
+      const foundIdx = idsToDelete.findIndex((item) => item === Number(img));
+      if (foundIdx >= 0) {
+        idsToDelete.splice(foundIdx, 1);
+      }
+    } else {
+      imagesToSave.push(img);
+    }
+  }
+
+  if (imagesToSave.length || idsToDelete.length) {
+    const fileNames = await Promise.all(imagesToSave.map(saveImage));
     if (isCreation) {
       gift.images = {
-        create: {
-          fileName,
+        createMany: {
+          data: fileNames.map((fileName) => ({ fileName })),
         },
       };
     } else {
       gift.images = {
-        create: {
-          fileName,
+        createMany: {
+          data: fileNames.map((fileName) => ({ fileName })),
         },
         deleteMany: {
-          NOT: {
-            fileName,
+          id: {
+            in: idsToDelete,
           },
         },
       };
@@ -59,7 +76,8 @@ const fillGiftItem = async (
 };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  const event = await getEvent(params.eventId);
+  const { eventId } = await params;
+  const event = await getEvent(eventId);
 
   if (!event.event) {
     return new NextResponse('', { status: 404 });
@@ -92,9 +110,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       idsToDelete.splice(foundIdx, 1);
     }
 
+    const existedGift = event.event.gifts.find((item) => item.id === Number(id));
+
     if (id) {
       const newGift: PrismaTypes.Prisma.GiftUpdateInput = {};
-      await fillGiftItem(body, i, newGift, false);
+      await fillGiftItem(body, i, newGift, false, existedGift?.images);
       prms.push(
         prisma.gift.update({
           data: newGift,
@@ -110,7 +130,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
           },
         },
       };
-      await fillGiftItem(body, i, newGift, true);
+      await fillGiftItem(body, i, newGift, true, existedGift?.images);
       prms.push(
         prisma.gift.create({
           data: newGift,
@@ -134,7 +154,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   await Promise.all(prms);
 
   const updatedEvent = await prisma.event.update({
-    where: { privateId: params.eventId },
+    where: { privateId: eventId },
     data,
     include: {
       gifts: {
