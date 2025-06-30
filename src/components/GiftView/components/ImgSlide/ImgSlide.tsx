@@ -18,17 +18,17 @@ export const ImgSlide: FC<ImgSlideProps> = ({ image }) => {
   }, [image.fileName]);
 
   return (
-    <div className="relative h-full max-h-[360px] sm:max-h-[480px]">
+    <div className="relative h-60">
       {img ? (
         <Image
           src={img}
           alt=""
-          width={640}
-          height={640}
+          width={580}
+          height={580}
           onError={() => {
             setImg('');
           }}
-          className="size-full object-contain"
+          className="size-full object-cover"
         />
       ) : (
         <div className="flex h-full items-center justify-center bg-white">
