@@ -204,9 +204,10 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
 
             {fieldsNew.length > 0 && (
               <div className="flex flex-col-reverse gap-6">
-                {fieldsNew.map((item, idx) => (
-                  <GiftForm key={item.fieldId} index={idx + fieldsExisted.length} onDeleteClick={() => remove(idx)} />
-                ))}
+                {fieldsNew.map((item, idx) => {
+                  const currentIdx = idx + fieldsExisted.length;
+                  return <GiftForm key={item.fieldId} index={currentIdx} onDeleteClick={() => remove(currentIdx)} />;
+                })}
               </div>
             )}
 
