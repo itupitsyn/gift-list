@@ -17,9 +17,9 @@ jobs:
           port: 51
           script: |
             cd apps/gift-list \
-            && docker stop gift-list \
-            && docker rm gift-list \
-            && docker rmi gift-list \
+            && docker stop gift-list || true \
+            && docker rm gift-list || true \
+            && docker rmi gift-list || true \
             && git pull \
             && docker build . -t gift-list \
             && docker run -d -p 3000:3000 \
