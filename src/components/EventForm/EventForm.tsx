@@ -1,21 +1,23 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FC, useCallback, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { GiftForm } from '../GiftForm';
-import { FullEvent, updateEvent, UpdateEventRequest } from '@/api-service/event';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { convertLocalToUTCDate, getImageUrl } from '@/lib/utils';
-import { useShowBottomPanelBorder } from '@/lib/hooks/useShowBottomPanelBorder';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+import { FullEvent, updateEvent, UpdateEventRequest } from '@/api-service/event';
+import { useShowBottomPanelBorder } from '@/lib/hooks/useShowBottomPanelBorder';
+import { convertLocalToUTCDate, getImageUrl } from '@/lib/utils';
+
+import { GiftForm } from '../GiftForm';
+import { ImageUploaderElement } from '../ImageUploader';
 import { Button } from '../ui/button';
-import { CopyButton } from './components';
 import { DatePicker } from '../ui/datepicker';
 import { Form, FormField, FormItem, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { ImageUploaderElement } from '../ImageUploader';
+import { CopyButton } from './components';
 
 interface EventFormProps {
   event: FullEvent;

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
+
 import { Button } from './ui/button';
 
 export const CreateEventButton: FC = () => {

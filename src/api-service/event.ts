@@ -1,5 +1,6 @@
-import axios from 'axios';
 import type * as PrismaTypes from '@prisma/client';
+import axios from 'axios';
+
 import { ImageUploaderElement } from '@/components/ImageUploader';
 
 export type FullEvent = PrismaTypes.Event & {

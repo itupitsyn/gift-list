@@ -1,16 +1,18 @@
 'use client';
 
+import { ExternalLink, Trash } from 'lucide-react';
+import Link from 'next/link';
 import { FC } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+
 import { EventFormData } from './EventForm';
+import { ImageUploader } from './ImageUploader';
+import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Checkbox } from './ui/checkbox';
-import { Label } from './ui/label';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Trash } from 'lucide-react';
 import { FormField, FormItem, FormMessage } from './ui/form';
-import { ImageUploader } from './ImageUploader';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 interface GiftFormProps {
   index: number;
@@ -65,7 +67,21 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
         name={`gifts.${index}.link`}
         render={({ field }) => (
           <FormItem>
-            <Input {...field} value={field.value || ''} placeholder="Ссылка" type="url" />
+            <div className="flex gap-2">
+              <Input {...field} value={field.value || ''} placeholder="Ссылка" type="url" />
+
+              {field.value ? (
+                <Button variant="ghost" asChild>
+                  <Link href={field.value || '#'} prefetch={false} target="_blank">
+                    <ExternalLink />
+                  </Link>
+                </Button>
+              ) : (
+                <Button disabled variant="ghost">
+                  <ExternalLink />
+                </Button>
+              )}
+            </div>
             <FormMessage />
           </FormItem>
         )}

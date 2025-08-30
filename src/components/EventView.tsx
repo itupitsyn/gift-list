@@ -1,8 +1,10 @@
 'use client';
 
 import { FC } from 'react';
-import { GiftView } from './GiftView';
+
 import { FullEvent } from '@/api-service/event';
+
+import { GiftView } from './GiftView';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface EventViewProps {

@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
-import { getEvent } from '../../../../../prisma/model/event';
 import type * as PrismaTypes from '@prisma/client';
-import prisma from '../../../../../prisma/db';
 import fs from 'fs';
+import { NextResponse } from 'next/server';
 import path from 'path';
+
+import prisma from '../../../../../prisma/db';
+import { getEvent } from '../../../../../prisma/model/event';
 
 type RouteParams = { params: Promise<{ eventId: string }> };
 

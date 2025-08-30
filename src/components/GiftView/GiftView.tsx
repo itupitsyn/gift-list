@@ -1,12 +1,14 @@
 'use client';
 
-import { bookGift, FullGift } from '@/api-service/gift';
 import { FC, KeyboardEvent, RefObject, useCallback, useRef, useState } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+
+import { bookGift, FullGift } from '@/api-service/gift';
+
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { ImageSwiper } from './components';
 
 interface GiftViewProps {
@@ -53,7 +55,7 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
   return (
     <Card className="px-6">
       <div className="flex flex-col items-stretch gap-6 overflow-hidden sm:flex-row sm:justify-between">
-        <div className="max-w-96 flex-none">
+        <div className="w-full max-w-96 flex-none">
           <ImageSwiper images={gift.images} />
         </div>
 
@@ -63,7 +65,7 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
               {giftState.link ? (
                 <a
                   href={giftState.link}
-                  className="block overflow-hidden text-xl text-ellipsis underline underline-offset-4 transition-colors hover:text-lime-400"
+                  className="block overflow-hidden text-xl text-ellipsis underline underline-offset-4 transition-colors hover:text-purple-600"
                   target="_blank"
                   rel="noreferrer"
                 >

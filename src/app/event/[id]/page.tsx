@@ -1,8 +1,10 @@
-import { EventForm } from '@/components/EventForm';
-import { getEvent } from '../../../../prisma/model/event';
-import { notFound } from 'next/navigation';
-import { EventView } from '@/components/EventView';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { EventForm } from '@/components/EventForm';
+import { EventView } from '@/components/EventView';
+
+import { getEvent } from '../../../../prisma/model/event';
 
 interface PageParams {
   params: Promise<{ id: string }>;

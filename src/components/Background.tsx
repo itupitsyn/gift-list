@@ -1,12 +1,13 @@
 'use client';
 import { ReactNode, useEffect, useState } from 'react';
-import Icon1 from '../assets/purple-festive-baloons-with-transparent-background-2.svg';
+import { useDebounceValue } from 'usehooks-ts';
+
 import Icon2 from '../assets/purple-festive-baloons-with-transparent-background.svg';
+import Icon1 from '../assets/purple-festive-baloons-with-transparent-background-2.svg';
 import Icon3 from '../assets/purple-gift-with-transparent-background-1.svg';
 import Icon4 from '../assets/purple-gift-with-transparent-background-2.svg';
 import Icon5 from '../assets/purple-gift-with-transparent-background-3.svg';
 import Icon6 from '../assets/purple-two-baloons-with-transparent-background-2.svg';
-import { useDebounceValue } from 'usehooks-ts';
 
 const iconsSet = [Icon1, Icon2, Icon3, Icon4, Icon5, Icon6] as const;
 const wSizeApprox = 138;

@@ -1,4 +1,5 @@
 import type * as PrismaTypes from '@prisma/client';
+
 import prisma from '../db';
 
 const getId = () => {

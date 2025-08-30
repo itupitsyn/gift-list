@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { bookGift } from '../../../../../../../prisma/model/gift';
 
 type RouteParams = { params: Promise<{ eventId: string; giftId: string }> };

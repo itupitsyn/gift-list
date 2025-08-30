@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { FullEvent } from './event';
 
 type ArrayItem<T> = T extends Array<infer E> ? E : never;

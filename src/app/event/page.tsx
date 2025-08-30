@@ -1,4 +1,5 @@
 import { notFound, redirect, RedirectType } from 'next/navigation';
+
 import { createEvent } from '../../../prisma/model/event';
 
 export default async function Page() {
