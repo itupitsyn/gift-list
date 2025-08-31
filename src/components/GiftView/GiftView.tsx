@@ -4,6 +4,7 @@ import { FC, KeyboardEvent, RefObject, useCallback, useRef, useState } from 'rea
 import { useOnClickOutside } from 'usehooks-ts';
 
 import { bookGift, FullGift } from '@/api-service/gift';
+import { cn } from '@/lib/utils';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -55,7 +56,7 @@ export const GiftView: FC<GiftViewProps> = ({ gift, eventPublicId }) => {
   return (
     <Card className="px-6">
       <div className="flex flex-col items-stretch gap-6 overflow-hidden sm:flex-row sm:justify-between">
-        <div className="w-full max-w-96 flex-none">
+        <div className={cn('w-full max-w-96 flex-none', giftState.booked && 'grayscale')}>
           <ImageSwiper images={gift.images} />
         </div>
 
