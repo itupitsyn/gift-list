@@ -2,7 +2,7 @@
 
 import { Ghost, X } from 'lucide-react';
 import Image from 'next/image';
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
 
@@ -15,16 +15,46 @@ export type ImageUploaderElement = { id: number; src: string; file?: File; uploa
 interface ImageUploaderProps {
   images: ImageUploaderElement[];
   isLoading?: boolean;
+  isDisabled?: boolean;
   onDrop: (data: File[]) => void;
   onDelete: (img: ImageUploaderElement) => void;
   onBlur?: () => void;
 }
 
-export const ImageUploader: FC<ImageUploaderProps> = ({ images, isLoading, onDrop, onDelete, onBlur }) => {
+export const ImageUploader: FC<ImageUploaderProps> = ({ images, isDisabled, isLoading, onDrop, onDelete, onBlur }) => {
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: Object.fromEntries(IMG_FORMATS.map((item) => [item, []])),
   });
+
+  const pasteFromClipBoardClick = useCallback(async () => {
+    if (isDisabled || isLoading) {
+      return;
+    }
+    try {
+      const files: File[] = [];
+      const clipboardItems = await navigator.clipboard.read();
+
+      for (const item of clipboardItems) {
+        const foundType = item.types.find((currType) => currType.startsWith('image/'));
+        if (!foundType) {
+          continue;
+        }
+
+        const blob = await item.getType(foundType); // Get the image as a File object (Blob)
+
+        const extension = blob.type.split('/')[1];
+        const file = new File([blob], `${Math.random().toString(32).replace('.', '')}.${extension}`, {
+          type: blob.type,
+        });
+
+        files.push(file);
+      }
+      onDrop(files);
+    } catch {
+      toast.error('Ошибка чтения из буфера обмена');
+    }
+  }, [isDisabled, isLoading, onDrop]);
 
   return (
     <>
@@ -43,7 +73,7 @@ export const ImageUploader: FC<ImageUploaderProps> = ({ images, isLoading, onDro
 
             <button
               type="button"
-              disabled={isLoading}
+              disabled={isLoading || isDisabled}
               className="absolute top-1 right-1 cursor-pointer transition-colors hover:text-red-600 disabled:cursor-default"
               onClick={() => onDelete(item)}
             >
@@ -58,37 +88,13 @@ export const ImageUploader: FC<ImageUploaderProps> = ({ images, isLoading, onDro
           {...getRootProps()}
           className="flex cursor-pointer items-center justify-center rounded-b-sm border border-dashed p-6 transition-colors hover:border-fuchsia-700 hover:text-fuchsia-700"
         >
-          <input {...getInputProps()} disabled={isLoading} />
+          <input {...getInputProps()} disabled={isLoading || isDisabled} />
           <p className="text-center text-sm">Переместите сюда файлы, или кликните, чтобы выбрать файлы с диска</p>
         </div>
 
         <div
           className="flex cursor-pointer items-center justify-center rounded-b-sm border border-dashed p-6 transition-colors hover:border-fuchsia-700 hover:text-fuchsia-700"
-          onClick={async () => {
-            try {
-              const files: File[] = [];
-              const clipboardItems = await navigator.clipboard.read();
-
-              for (const item of clipboardItems) {
-                const foundType = item.types.find((currType) => currType.startsWith('image/'));
-                if (!foundType) {
-                  continue;
-                }
-
-                const blob = await item.getType(foundType); // Get the image as a File object (Blob)
-
-                const extension = blob.type.split('/')[1];
-                const file = new File([blob], `${Math.random().toString(32).replace('.', '')}.${extension}`, {
-                  type: blob.type,
-                });
-
-                files.push(file);
-              }
-              onDrop(files);
-            } catch {
-              toast.error('Ошибка чтения из буфера обмена');
-            }
-          }}
+          onClick={pasteFromClipBoardClick}
         >
           <p className="text-center text-sm">Вставить файл из буфера обмена</p>
         </div>

@@ -1,6 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import { FC, useCallback, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -150,6 +152,11 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
 
               <div className="mt-6 flex items-center justify-between gap-2">
                 <div className="max-w-full truncate">{publicLink}</div>
+                <Button variant="ghost" asChild>
+                  <Link href={publicLink} prefetch={false} target="_blank">
+                    <ExternalLink />
+                  </Link>
+                </Button>
                 <CopyButton textToCopy={publicLink} />
               </div>
               <div className="mt-1 text-xs font-light opacity-60">Это публичная ссылка для ваших друзей</div>
@@ -199,6 +206,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
                 variant="outline"
                 className="sm:self-end"
                 onClick={() => append({ name: '', price: 0, booked: false })}
+                disabled={isSubmitting}
               >
                 Добавить
               </Button>
@@ -208,14 +216,30 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
               <div className="flex flex-col-reverse gap-6">
                 {fieldsNew.map((item, idx) => {
                   const currentIdx = idx + fieldsExisted.length;
-                  return <GiftForm key={item.fieldId} index={currentIdx} onDeleteClick={() => remove(currentIdx)} />;
+                  return (
+                    <GiftForm
+                      key={item.fieldId}
+                      index={currentIdx}
+                      onDeleteClick={() => {
+                        remove(currentIdx);
+                      }}
+                      isDisabled={isSubmitting}
+                    />
+                  );
                 })}
               </div>
             )}
 
             <div className="flex flex-col gap-6">
               {fieldsExisted.map((item, idx) => (
-                <GiftForm key={item.fieldId} index={idx} onDeleteClick={() => remove(idx)} />
+                <GiftForm
+                  key={item.fieldId}
+                  index={idx}
+                  onDeleteClick={() => {
+                    remove(idx);
+                  }}
+                  isDisabled={isSubmitting}
+                />
               ))}
             </div>
           </div>

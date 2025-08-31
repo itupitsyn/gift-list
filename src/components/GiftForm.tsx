@@ -16,10 +16,11 @@ import { Label } from './ui/label';
 
 interface GiftFormProps {
   index: number;
+  isDisabled?: boolean;
   onDeleteClick: () => void;
 }
 
-export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
+export const GiftForm: FC<GiftFormProps> = ({ index, isDisabled, onDeleteClick }) => {
   const { control } = useFormContext<EventFormData>();
 
   const {
@@ -38,7 +39,14 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
             render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <Label>
-                  <Checkbox {...field} checked={value} onCheckedChange={onChange} color="purple" className="mr-2" />
+                  <Checkbox
+                    {...field}
+                    checked={value}
+                    onCheckedChange={onChange}
+                    color="purple"
+                    className="mr-2"
+                    disabled={isDisabled}
+                  />
                   Забронировано
                 </Label>
               </FormItem>
@@ -46,7 +54,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
           />
         </div>
 
-        <Button variant="ghost" type="button" onClick={onDeleteClick} className="group self-end">
+        <Button variant="ghost" type="button" onClick={onDeleteClick} className="group self-end" disabled={isDisabled}>
           <Trash className="size-4 transition-colors group-hover:text-red-500" />
         </Button>
       </div>
@@ -56,7 +64,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
         name={`gifts.${index}.name`}
         render={({ field }) => (
           <FormItem>
-            <Input {...field} placeholder="Название" />
+            <Input {...field} placeholder="Название" disabled={isDisabled} />
             <FormMessage />
           </FormItem>
         )}
@@ -68,7 +76,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
         render={({ field }) => (
           <FormItem>
             <div className="flex gap-2">
-              <Input {...field} value={field.value || ''} placeholder="Ссылка" type="url" />
+              <Input {...field} value={field.value || ''} placeholder="Ссылка" type="url" disabled={isDisabled} />
 
               {field.value ? (
                 <Button variant="ghost" asChild>
@@ -93,7 +101,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
         render={({ field }) => (
           <FormItem>
             <Label htmlFor={`price-${index}`}>Цена</Label>
-            <Input type="number" id={`price-${index}`} {...field} value={field.value || ''} />
+            <Input type="number" id={`price-${index}`} {...field} value={field.value || ''} disabled={isDisabled} />
             <FormMessage />
           </FormItem>
         )}
@@ -110,6 +118,7 @@ export const GiftForm: FC<GiftFormProps> = ({ index, onDeleteClick }) => {
               <ImageUploader
                 images={imgFields}
                 onBlur={onBlur}
+                isDisabled={isDisabled}
                 onDrop={(data) => {
                   data.forEach((file) =>
                     append({

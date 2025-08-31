@@ -48,7 +48,7 @@ export const ImgSlide: FC<ImgSlideProps> = ({ image }) => {
       {isFS &&
         createPortal(
           <div
-            className="absolute top-0 right-0 bottom-0 left-0 z-50 flex w-full cursor-zoom-out items-center backdrop-blur-sm backdrop-brightness-50"
+            className="fixed top-0 right-0 bottom-0 left-0 z-50 flex w-full cursor-zoom-out items-center backdrop-blur-sm backdrop-brightness-50"
             onClick={() => {
               setIsFS(false);
             }}
