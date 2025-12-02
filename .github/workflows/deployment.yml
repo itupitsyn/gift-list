@@ -14,13 +14,13 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          port: 51
+          port: 52
           script: |
             cd apps/gift-list \
             && docker stop gift-list || true \
             && docker rm gift-list || true \
             && docker rmi gift-list || true \
-            && git pull \
+            && git fetch && git reset origin/master --hard \
             && docker build . -t gift-list \
             && docker run -d -p 3000:3000 \
               -e DATABASE_URL=postgresql://gift-list:gift-list@192.168.1.111:5432/gift-list?schema=public \

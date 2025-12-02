@@ -17,3 +17,5 @@ export default async function Page() {
     notFound();
   }
 }
+
+export const dynamic = 'force-dynamic';
