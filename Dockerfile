@@ -1,4 +1,4 @@
-ARG bun_image=oven/bun:alpine
+ARG bun_image=oven/bun:debian
 
 FROM $bun_image AS builder
 WORKDIR /gift-list
