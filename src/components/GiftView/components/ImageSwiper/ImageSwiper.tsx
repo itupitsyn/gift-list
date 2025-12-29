@@ -2,19 +2,19 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-import type * as PrismaTypes from '@prisma/client';
 import { CSSProperties, FC, useMemo } from 'react';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import { Prisma } from '../../../../../prisma/generated/prisma/client';
 import { ImgSlide } from '../ImgSlide';
 
 interface ImageSwiperProps {
-  images: PrismaTypes.Image[];
+  images: Prisma.ImageModel[];
 }
 
 export const ImageSwiper: FC<ImageSwiperProps> = ({ images }) => {
-  const imgList: PrismaTypes.Image[] = useMemo(() => {
+  const imgList: Prisma.ImageModel[] = useMemo(() => {
     if (images.length) {
       return images;
     }
@@ -46,7 +46,7 @@ export const ImageSwiper: FC<ImageSwiperProps> = ({ images }) => {
         className="flex"
       >
         {imgList.map((img) => (
-          <SwiperSlide key={img.id} className="!h-auto self-stretch">
+          <SwiperSlide key={img.id} className="h-auto! self-stretch">
             <ImgSlide image={img} />
           </SwiperSlide>
         ))}

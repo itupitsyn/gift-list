@@ -1,6 +1,5 @@
 'use client';
 
-import type * as PrismaTypes from '@prisma/client';
 import { Ghost } from 'lucide-react';
 import Image from 'next/image';
 import { FC, useEffect, useState } from 'react';
@@ -8,8 +7,10 @@ import { createPortal } from 'react-dom';
 
 import { getImageUrl } from '@/lib/utils';
 
+import { Prisma } from '../../../../../prisma/generated/prisma/client';
+
 interface ImgSlideProps {
-  image: PrismaTypes.Image;
+  image: Prisma.ImageModel;
 }
 
 export const ImgSlide: FC<ImgSlideProps> = ({ image }) => {

@@ -1,6 +1,5 @@
-import type * as PrismaTypes from '@prisma/client';
-
 import prisma from '../db';
+import { Prisma } from '../generated/prisma/client';
 
 const getId = () => {
   let result = '';
@@ -12,7 +11,7 @@ const getId = () => {
 };
 
 export const createEvent = async () => {
-  const newEvent: PrismaTypes.Prisma.EventCreateInput = {
+  const newEvent: Prisma.EventCreateInput = {
     name: '',
     ownerContact: '',
     privateId: getId(),

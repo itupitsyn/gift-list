@@ -1,10 +1,11 @@
-import type * as PrismaTypes from '@prisma/client';
 import axios from 'axios';
 
 import { ImageUploaderElement } from '@/components/ImageUploader';
 
-export type FullEvent = PrismaTypes.Event & {
-  gifts: (PrismaTypes.Gift & { images: PrismaTypes.Image[] })[];
+import { Prisma } from '../../prisma/generated/prisma/client';
+
+export type FullEvent = Prisma.EventModel & {
+  gifts: (Prisma.GiftModel & { images: Prisma.ImageModel[] })[];
 };
 
 export interface UpdateEventRequest {

@@ -134,7 +134,7 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
       <div className="flex w-full flex-col items-center justify-between gap-6">
         <form
           noValidate
-          className="flex w-full max-w-screen-md flex-col gap-12 rounded px-2 backdrop-blur-sm"
+          className="flex w-full max-w-3xl flex-col gap-12 rounded px-2 backdrop-blur-sm"
           id="event-form"
           onSubmit={handleSubmit(submitHandler)}
         >
@@ -246,8 +246,8 @@ export const EventForm: FC<EventFormProps> = ({ event, publicLink, privateLink }
         </form>
 
         <div className="sticky bottom-0 flex flex-col items-center self-stretch backdrop-blur-sm" ref={ref}>
-          {showBorder && <div className="h-[1px] self-stretch bg-gradient-to-r from-purple-500 to-pink-500" />}
-          <div className="flex w-full max-w-screen-md justify-end px-2 py-6">
+          {showBorder && <div className="h-px self-stretch bg-linear-to-r from-purple-500 to-pink-500" />}
+          <div className="flex w-full max-w-3xl justify-end px-2 py-6">
             <Button
               type="submit"
               variant="outline"

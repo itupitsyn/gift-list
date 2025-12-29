@@ -1,9 +1,9 @@
-import type * as PrismaTypes from '@prisma/client';
 import fs from 'fs';
 import { NextResponse } from 'next/server';
 import path from 'path';
 
 import prisma from '../../../../../prisma/db';
+import { Prisma } from '../../../../../prisma/generated/prisma/client';
 import { getEvent } from '../../../../../prisma/model/event';
 
 type RouteParams = { params: Promise<{ eventId: string }> };
@@ -23,9 +23,9 @@ const saveImage = async (file: File) => {
 const fillGiftItem = async (
   body: FormData,
   idx: number,
-  gift: PrismaTypes.Prisma.GiftCreateInput | PrismaTypes.Prisma.GiftUpdateInput,
+  gift: Prisma.GiftCreateInput | Prisma.GiftUpdateInput,
   isCreation: boolean,
-  existedImages: PrismaTypes.Image[] | undefined,
+  existedImages: Prisma.ImageModel[] | undefined,
 ) => {
   const name = body.get(`gifts[${idx}].name`) as string;
   if (name) gift.name = name;
@@ -89,7 +89,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   const body = await request.formData();
-  const data: PrismaTypes.Prisma.EventUpdateInput = {};
+  const data: Prisma.EventUpdateInput = {};
 
   const name = body.get('name') as string;
   if (name) data.name = name;
@@ -114,7 +114,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const existedGift = event.event.gifts.find((item) => item.id === Number(id));
 
     if (id) {
-      const newGift: PrismaTypes.Prisma.GiftUpdateInput = {};
+      const newGift: Prisma.GiftUpdateInput = {};
       await fillGiftItem(body, i, newGift, false, existedGift?.images);
       prms.push(
         prisma.gift.update({
@@ -123,7 +123,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         }),
       );
     } else {
-      const newGift: PrismaTypes.Prisma.GiftCreateInput = {
+      const newGift: Prisma.GiftCreateInput = {
         name: '',
         event: {
           connect: {
