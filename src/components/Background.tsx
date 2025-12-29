@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useDebounceValue } from 'usehooks-ts';
 
 import Icon2 from '../assets/purple-festive-baloons-with-transparent-background.svg';
@@ -16,7 +16,6 @@ const hSizeApprox = 181;
 // 963 x 1266;
 
 export const Background = () => {
-  const [icons, setIcons] = useState<ReactNode[]>([]);
   const [pageSize, setPageSize] = useState({ w: 0, h: 0 });
   const [pageSizeDeb] = useDebounceValue(pageSize, 500);
 
@@ -32,7 +31,7 @@ export const Background = () => {
     };
   }, []);
 
-  useEffect(() => {
+  const icons = useMemo(() => {
     const result: ReactNode[] = [];
 
     const wNum = Math.round(pageSizeDeb.w / wSizeApprox);
@@ -66,7 +65,8 @@ export const Background = () => {
         );
       }
     }
-    setIcons(result);
+
+    return result;
   }, [pageSizeDeb.h, pageSizeDeb.w]);
 
   return <div>{icons}</div>;

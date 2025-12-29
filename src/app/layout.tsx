@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="dark">
-      <body className={cn(inter.className, 'min-w-[300px] dark:text-white')}>
+      <body className={cn(inter.className, 'min-w-75 dark:text-white')}>
         {children}
         <Background />
         <Toaster position="top-center" />

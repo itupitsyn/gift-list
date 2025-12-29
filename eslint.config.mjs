@@ -1,23 +1,35 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const cfg = {
-  extends: ['prettier', 'next/core-web-vitals', 'next/typescript'],
-  plugins: ['prettier', 'simple-import-sort'],
-  rules: {
-    'prettier/prettier': ['error', { endOfLine: 'auto' }],
-    'simple-import-sort/imports': 'error',
-    'simple-import-sort/exports': 'error',
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  eslintPluginPrettierRecommended,
+  {
+    rules: {
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    },
   },
-};
+  {
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+    },
+    rules: {
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+    },
+  },
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+  ]),
+]);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: cfg,
-});
-
-export default compat.config(cfg);
+export default eslintConfig;
